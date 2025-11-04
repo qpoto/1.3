@@ -3,9 +3,9 @@ package ru.qpoto.model;
 import java.util.List;
 
 public class Post {
-    Status status;
-    Long id;
-    String title;
-    String content;
-    List<Label> labels;
+    private Long id;
+    private String title;
+    private String content;
+    private List<Label> labels;
+    private Status status = Status.ACTIVE;
 }
