@@ -1,6 +1,9 @@
 package ru.qpoto;
 
 import ru.qpoto.controller.AppController;
+import ru.qpoto.repository.LabelRepository;
+import ru.qpoto.repository.PostRepository;
+import ru.qpoto.repository.WriterRepository;
 import ru.qpoto.repository.impl.GsonLabelRepositoryImpl;
 import ru.qpoto.repository.impl.GsonPostRepositoryImpl;
 import ru.qpoto.repository.impl.GsonWriterRepositoryImpl;
@@ -13,9 +16,9 @@ public class Main {
         WriterView writerView = new WriterView();
         LabelView labelView = new LabelView();
         PostView postView = new PostView();
-        GsonWriterRepositoryImpl gsonWriterRepository = new GsonWriterRepositoryImpl();
-        GsonLabelRepositoryImpl gsonLabelRepository = new GsonLabelRepositoryImpl();
-        GsonPostRepositoryImpl gsonPostRepository = new GsonPostRepositoryImpl();
+        WriterRepository gsonWriterRepository = new GsonWriterRepositoryImpl();
+        LabelRepository gsonLabelRepository = new GsonLabelRepositoryImpl();
+        PostRepository gsonPostRepository = new GsonPostRepositoryImpl();
         AppController controller = new AppController(writerView, labelView, postView, gsonWriterRepository, gsonLabelRepository, gsonPostRepository);
 
         controller.run();
