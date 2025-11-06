@@ -1,15 +1,8 @@
 package ru.qpoto.controller;
 
 import ru.qpoto.repository.PostRepository;
-import ru.qpoto.view.PostView;
+import ru.qpoto.repository.impl.GsonPostRepositoryImpl;
 
 public class PostController {
-    private final PostRepository postRepository;
-    private final PostView postView;
-
-
-    public PostController(PostRepository postRepository, PostView postView) {
-        this.postRepository = postRepository;
-        this.postView = postView;
-    }
+    private final PostRepository postRepository = new GsonPostRepositoryImpl();
 }

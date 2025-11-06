@@ -1,15 +1,10 @@
 package ru.qpoto.controller;
 
 import ru.qpoto.repository.WriterRepository;
-import ru.qpoto.view.WriterView;
+import ru.qpoto.repository.impl.GsonWriterRepositoryImpl;
 
 public class WriterController {
-    private final WriterRepository writerRepository;
-    private final WriterView writerView;
+    private final WriterRepository writerRepository = new GsonWriterRepositoryImpl();
 
 
-    public WriterController(WriterRepository writerRepository, WriterView writerView) {
-        this.writerRepository = writerRepository;
-        this.writerView = writerView;
-    }
 }

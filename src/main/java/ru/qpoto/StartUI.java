@@ -1,11 +1,19 @@
 package ru.qpoto;
 
+import ru.qpoto.view.LabelView;
+import ru.qpoto.view.PostView;
+import ru.qpoto.view.WriterView;
+
 import java.util.List;
 import java.util.Scanner;
 
 public class StartUI {
     private final List<String> commands = List.of("Writers", "Labels", "Posts", "Exit");
+
     private final Scanner scanner = new Scanner(System.in);
+    private final WriterView writerView = new WriterView();
+    private final LabelView labelView = new LabelView();
+    private final PostView postView = new PostView();
 
     private void showMenu() {
         System.out.println("Menu:");
