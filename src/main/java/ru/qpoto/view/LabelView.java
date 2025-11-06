@@ -11,8 +11,11 @@ public class LabelView {
     private final Scanner scanner = new Scanner(System.in);
 
     private void showMenu() {
+        System.out.println();
+        System.out.println("======================");
         System.out.println("Меню Labels:");
         commands.forEach((cmd) -> System.out.println(commands.indexOf(cmd) + ". " + cmd));
+        System.out.print("Введите цифру от 0 до " + (commands.size() - 1) + ": ");
     }
 
     public void run() {

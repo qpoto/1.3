@@ -16,8 +16,11 @@ public class StartUI {
     private final PostView postView = new PostView();
 
     private void showMenu() {
-        System.out.println("Меню:");
+        System.out.println();
+        System.out.println("======================");
+        System.out.println("Главное меню:");
         commands.forEach((cmd) -> System.out.println(commands.indexOf(cmd) + ". " + cmd));
+        System.out.print("Введите цифру от 0 до " + (commands.size() - 1) + ": ");
     }
 
     public void run() {
