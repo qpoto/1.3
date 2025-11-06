@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public class StartUI {
-    private final List<String> commands = List.of("Writers", "Labels", "Posts", "Exit");
+    private final List<String> commands = List.of("Writers", "Posts", "Labels", "Exit");
 
     private final Scanner scanner = new Scanner(System.in);
     private final WriterView writerView = new WriterView();
@@ -16,7 +16,7 @@ public class StartUI {
     private final PostView postView = new PostView();
 
     private void showMenu() {
-        System.out.println("Menu:");
+        System.out.println("Меню:");
         commands.forEach((cmd) -> System.out.println(commands.indexOf(cmd) + ". " + cmd));
     }
 
@@ -38,9 +38,9 @@ public class StartUI {
     private boolean getView(int select, boolean run) {
         String command = commands.get(select);
         switch (command) {
-            case "Writers" -> System.out.println("Вы выбрали Writers");
-            case "Labels" -> System.out.println("Вы выбрали Labels");
-            case "Posts" -> System.out.println("Вы выбрали Posts");
+            case "Writers" -> writerView.run();
+            case "Posts" -> labelView.run();
+            case "Labels" -> postView.run();
             case "Exit" -> {
                 System.out.println("Программа завершена.");
                 run = false;
