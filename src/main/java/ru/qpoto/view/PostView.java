@@ -11,7 +11,7 @@ public class PostView {
     private final Scanner scanner = new Scanner(System.in);
 
     private void showMenu() {
-        System.out.println("Меню Writers:");
+        System.out.println("Меню Posts:");
         commands.forEach((cmd) -> System.out.println(commands.indexOf(cmd) + ". " + cmd));
     }
 
