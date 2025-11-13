@@ -102,4 +102,25 @@ public class GsonWriterRepositoryImpl implements WriterRepository {
             e.printStackTrace();
         }
     }
+
+    @Override
+    public void deleteLabel(Long id) {
+        List<Writer> writers = findAll();
+        writers.forEach(writer ->
+                writer.getPosts()
+                        .forEach(post ->
+                        post.getLabels()
+                                .stream()
+                                .filter(label -> label.getId().equals(id))
+                                .findFirst()
+                                .ifPresent(label -> label.setStatus(Status.DELETED))
+                )
+        );
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        try (FileWriter jsonFileWriter = new FileWriter(path)) {
+            gson.toJson(writers, jsonFileWriter);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

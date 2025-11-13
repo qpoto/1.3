@@ -127,13 +127,13 @@ public class WriterView {
         System.out.println("Укажите id");
         Long id = scanner.nextLong();
         Writer newWriter = writerController.findById(id);
-        System.out.println("Обновить firstName?");
+        System.out.println("Обновить firstName? нажмите Y или N");
         String firstName = scanner.next();
         if (firstName.equalsIgnoreCase(YES)) {
             System.out.println("Введите firstName");
             newWriter.setFirstName(scanner.next());
         }
-        System.out.println("Обновить lastName");
+        System.out.println("Обновить lastName? нажмите Y или N");
         String lastName = scanner.next();
         if (lastName.equalsIgnoreCase(YES)) {
             System.out.println("Введите lastName");
