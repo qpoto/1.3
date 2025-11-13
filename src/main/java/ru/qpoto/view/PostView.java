@@ -1,14 +1,23 @@
 package ru.qpoto.view;
 
-import ru.qpoto.controller.PostController;
 
+import ru.qpoto.controller.LabelController;
+import ru.qpoto.controller.PostController;
+import ru.qpoto.model.Label;
+import ru.qpoto.model.Post;
+import ru.qpoto.model.Writer;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 public class PostView {
-    private final PostController posController = new PostController();
-    private final List<String> commands = List.of("Создать", "Найти", "Обновить", "Удалить", "Возврат к предыдущему меню");
+    private final PostController postController = new PostController();
+    private final LabelController labelController = new LabelController();
+    private final LabelView labelView = new LabelView();
+    private final List<String> commands = List.of("Создать", "Найти", "Показать всех", "Обновить", "Удалить", "Возврат к предыдущему меню");
     private final Scanner scanner = new Scanner(System.in);
+    private final String YES = "y";
 
     private void showMenu() {
         System.out.println();
@@ -36,10 +45,11 @@ public class PostView {
     private boolean getView(int select, boolean run) {
         String command = commands.get(select);
         switch (command) {
-            case "Создать" -> System.out.println("Вы выбрали Создать Post");
-            case "Найти" -> System.out.println("Вы выбрали Найти Post");
-            case "Обновить" -> System.out.println("Вы выбрали Обновить Post");
-            case "Удалить" -> System.out.println("Вы выбрали Удалить Post");
+            case "Создать" -> createPost();
+            case "Найти" -> getById();
+            case "Показать всех" -> showAllPosts();
+            case "Обновить" -> update();
+            case "Удалить" -> deletePost();
             case "Возврат к предыдущему меню" -> {
                 run = false;
             }
@@ -63,5 +73,77 @@ public class PostView {
             return false;
         }
         return true;
+    }
+
+    public void createPost() {
+        Post newPost = new Post();
+        System.out.println("Укажите title");
+        String title = scanner.next();
+        System.out.println("Укажите content");
+        String content = scanner.next();
+        System.out.println("Добавить labels? нажмите Y или N");
+        String needLabels = scanner.next();
+        List<Label> labels = new ArrayList<>();
+        if (needLabels.equalsIgnoreCase(YES)) {
+            if (labelController.findAll().isEmpty()) {
+                System.out.println("Нет созданных Label, создать? нажмите Y или N");
+                needLabels = scanner.next();
+                if (needLabels.equalsIgnoreCase(YES)) {
+                    labelView.createLabel();
+                    labelController.findAll().forEach(System.out::println);
+                    System.out.println("Выберете Label: ");
+                    Long needLabel = scanner.nextLong();
+                    Label label = labelController.findById(needLabel);
+                    labels.add(label);
+                }
+            } else {
+                postController.findAll().forEach(System.out::println);
+                System.out.println("Выберете Post");
+                Long needPost = scanner.nextLong();
+                Label label = labelController.findById(needPost);
+                labels.add(label);
+            }
+        }
+        newPost.setTitle(title);
+        newPost.setContent(content);
+        newPost.setLabels(labels);
+        postController.save(newPost);
+    }
+
+    private void deletePost() {
+        System.out.println("Укажите id");
+        showAllPosts();
+        Long id = scanner.nextLong();
+        postController.delete(id);
+    }
+
+    private void showAllPosts() {
+        postController.findAll().forEach(System.out::println);
+    }
+
+    private void getById() {
+        System.out.println("Укажите id");
+        Long id = scanner.nextLong();
+        System.out.println(postController.findById(id));
+    }
+
+    private void update() {
+        showAllPosts();
+        System.out.println("Укажите id");
+        Long id = scanner.nextLong();
+        Post newPost = postController.findById(id);
+        System.out.println("Обновить title?");
+        String title = scanner.next();
+        if (title.equalsIgnoreCase(YES)) {
+            System.out.println("Введите firstName");
+            newPost.setTitle(scanner.next());
+        }
+        System.out.println("Обновить content");
+        String content = scanner.next();
+        if (content.equalsIgnoreCase(YES)) {
+            System.out.println("Введите lastName");
+            newPost.setContent(scanner.next());
+        }
+        postController.update(newPost);
     }
 }

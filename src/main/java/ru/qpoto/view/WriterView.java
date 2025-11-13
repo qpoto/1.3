@@ -1,5 +1,6 @@
 package ru.qpoto.view;
 
+import ru.qpoto.controller.PostController;
 import ru.qpoto.controller.WriterController;
 import ru.qpoto.model.Post;
 import ru.qpoto.model.Writer;
@@ -7,13 +8,17 @@ import ru.qpoto.model.Writer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.SortedMap;
 
 public class WriterView {
     private final WriterController writerController = new WriterController();
+    private final PostController postController = new PostController();
+    private final PostView postView = new PostView();
     private final List<String> commands = List.of("Создать", "Найти", "Показать всех", "Обновить", "Удалить", "Возврат к предыдущему меню");
     private final Scanner scanner = new Scanner(System.in);
     private final LabelView labelView = new LabelView();
     private final String YES = "y";
+
 
     private void showMenu() {
         System.out.println();
@@ -85,7 +90,24 @@ public class WriterView {
         String needPosts = scanner.next();
         List<Post> posts = new ArrayList<>();
         if (needPosts.equalsIgnoreCase(YES)) {
-            labelView.run();
+            if (postController.findAll().isEmpty()) {
+                System.out.println("Нет созданных Post, создать? нажмите Y или N");
+                needPosts = scanner.next();
+                if (needPosts.equalsIgnoreCase(YES)) {
+                    postView.createPost();
+                    postController.findAll().forEach(System.out::println);
+                    System.out.println("Выберете Post: ");
+                    Long needPost = scanner.nextLong();
+                    Post post = postController.findById(needPost);
+                    posts.add(post);
+                }
+            } else {
+                postController.findAll().forEach(System.out::println);
+                System.out.println("Выберете Post");
+                Long needPost = scanner.nextLong();
+                Post post = postController.findById(needPost);
+                posts.add(post);
+            }
         }
         newWriter.setFirstName(firstName);
         newWriter.setLastName(lastName);
@@ -117,8 +139,6 @@ public class WriterView {
             System.out.println("Введите lastName");
             newWriter.setFirstName(scanner.next());
         }
-        newWriter.setFirstName(firstName);
-        newWriter.setLastName(lastName);
         writerController.update(newWriter);
     }
 

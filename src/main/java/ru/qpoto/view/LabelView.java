@@ -1,13 +1,14 @@
 package ru.qpoto.view;
 
 import ru.qpoto.controller.LabelController;
+import ru.qpoto.model.Label;
 
 import java.util.List;
 import java.util.Scanner;
 
 public class LabelView {
     public final LabelController labelController = new LabelController();
-    private final List<String> commands = List.of("Создать", "Найти", "Обновить", "Удалить", "Возврат к предыдущему меню");
+    private final List<String> commands = List.of("Создать", "Найти", "Показать всех", "Обновить", "Удалить", "Возврат к предыдущему меню");
     private final Scanner scanner = new Scanner(System.in);
 
     private void showMenu() {
@@ -36,10 +37,11 @@ public class LabelView {
     private boolean getView(int select, boolean run) {
         String command = commands.get(select);
         switch (command) {
-            case "Создать" -> System.out.println("Вы выбрали Создать Label");
-            case "Найти" -> System.out.println("Вы выбрали Найти Label");
-            case "Обновить" -> System.out.println("Вы выбрали Обновить Label");
-            case "Удалить" -> System.out.println("Вы выбрали Удалить Label");
+            case "Создать" -> createLabel();
+            case "Найти" -> getById();
+            case "Показать всех" -> showAllLabels();
+            case "Обновить" -> update();
+            case "Удалить" -> deleteLabel();
             case "Возврат к предыдущему меню" -> {
                 run = false;
             }
@@ -63,5 +65,41 @@ public class LabelView {
             return false;
         }
         return true;
+    }
+
+    public void createLabel() {
+        Label newLabel = new Label();
+        System.out.println("Укажите name");
+        String name = scanner.next();
+        newLabel.setName(name);
+        labelController.save(newLabel);
+    }
+
+    private void getById() {
+        System.out.println("Укажите id");
+        Long id = scanner.nextLong();
+        System.out.println(labelController.findById(id));
+    }
+
+    private void showAllLabels() {
+        labelController.findAll().forEach(System.out::println);
+    }
+
+    private void update() {
+        showAllLabels();
+        System.out.println("Укажите id");
+        Long id = scanner.nextLong();
+        Label newLabel = labelController.findById(id);
+        System.out.println("Укажите name");
+        String name = scanner.next();
+        newLabel.setName(name);
+        labelController.update(newLabel);
+    }
+
+    private void deleteLabel() {
+        System.out.println("Укажите id");
+        showAllLabels();
+        Long id = scanner.nextLong();
+        labelController.delete(id);
     }
 }

@@ -42,8 +42,8 @@ public class StartUI {
         String command = commands.get(select);
         switch (command) {
             case "Writers" -> writerView.run();
-            case "Posts" -> labelView.run();
-            case "Labels" -> postView.run();
+            case "Posts" -> postView.run();
+            case "Labels" -> labelView.run();
             case "Exit" -> {
                 System.out.println("Программа завершена.");
                 run = false;

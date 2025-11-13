@@ -3,6 +3,7 @@ package ru.qpoto.repository.impl;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import ru.qpoto.model.Post;
 import ru.qpoto.model.Status;
 import ru.qpoto.model.Writer;
 import ru.qpoto.repository.WriterRepository;
@@ -82,6 +83,23 @@ public class GsonWriterRepositoryImpl implements WriterRepository {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    @Override
+    public void deletePost(Long id) {
+        List<Writer> writers = findAll();
+        writers.forEach(writer ->
+                        writer.getPosts().stream()
+                                .filter(post -> post.getId().equals(id))
+                                .findFirst()
+                                .ifPresent(post -> post.setStatus(Status.DELETED))
+                );
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        try (FileWriter jsonFileWriter = new FileWriter(path)) {
+            gson.toJson(writers, jsonFileWriter);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
