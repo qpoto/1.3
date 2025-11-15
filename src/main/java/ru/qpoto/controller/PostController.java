@@ -3,14 +3,17 @@ package ru.qpoto.controller;
 import ru.qpoto.model.Post;
 import ru.qpoto.repository.PostRepository;
 import ru.qpoto.repository.WriterRepository;
-import ru.qpoto.repository.impl.GsonPostRepositoryImpl;
-import ru.qpoto.repository.impl.GsonWriterRepositoryImpl;
 
 import java.util.List;
 
 public class PostController {
-    private final PostRepository postRepository = new GsonPostRepositoryImpl();
-    private final WriterRepository writerRepository = new GsonWriterRepositoryImpl();
+    private final PostRepository postRepository;
+    private final WriterRepository writerRepository;
+
+    public PostController(PostRepository postRepository, WriterRepository writerRepository) {
+        this.postRepository = postRepository;
+        this.writerRepository = writerRepository;
+    }
 
     public List<Post> findAll() {
         return postRepository.findAll();

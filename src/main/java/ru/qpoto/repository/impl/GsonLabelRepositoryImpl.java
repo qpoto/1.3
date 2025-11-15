@@ -7,9 +7,7 @@ import ru.qpoto.model.Label;
 import ru.qpoto.model.Status;
 import ru.qpoto.repository.LabelRepository;
 
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -28,7 +26,7 @@ public class GsonLabelRepositoryImpl implements LabelRepository {
     @Override
     public List<Label> findAll() {
         Gson gson = new Gson();
-        try (FileReader reader = new FileReader(path)) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
             Type listType = new TypeToken<List<Label>>() {
             }.getType();
             List<Label> labels = gson.fromJson(reader, listType);
@@ -47,7 +45,7 @@ public class GsonLabelRepositoryImpl implements LabelRepository {
         labels.add(entity);
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        try (FileWriter jsonFileWriter = new FileWriter(path)) {
+        try (BufferedWriter jsonFileWriter = new BufferedWriter(new FileWriter(path))) {
             gson.toJson(labels, jsonFileWriter);
         } catch (IOException e) {
             e.printStackTrace();
@@ -61,7 +59,7 @@ public class GsonLabelRepositoryImpl implements LabelRepository {
         if (label != null && !label.equals(entity)) {
             labels.set(labels.indexOf(label), entity);
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            try (FileWriter jsonFileWriter = new FileWriter(path)) {
+            try (BufferedWriter jsonFileWriter = new BufferedWriter(new FileWriter(path))) {
                 gson.toJson(labels, jsonFileWriter);
             } catch (IOException e) {
                 e.printStackTrace();

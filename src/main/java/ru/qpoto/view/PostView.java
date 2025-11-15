@@ -5,19 +5,25 @@ import ru.qpoto.controller.LabelController;
 import ru.qpoto.controller.PostController;
 import ru.qpoto.model.Label;
 import ru.qpoto.model.Post;
-import ru.qpoto.model.Writer;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 public class PostView {
-    private final PostController postController = new PostController();
-    private final LabelController labelController = new LabelController();
-    private final LabelView labelView = new LabelView();
+    private final PostController postController;
+    private final LabelController labelController;
+    private final LabelView labelView;
     private final List<String> commands = List.of("Создать", "Найти", "Показать всех", "Обновить", "Удалить", "Возврат к предыдущему меню");
-    private final Scanner scanner = new Scanner(System.in);
+    private final Scanner scanner;
     private final String YES = "y";
+
+    public PostView(PostController postController, LabelController labelController, LabelView labelView, Scanner scanner) {
+        this.postController = postController;
+        this.labelController = labelController;
+        this.labelView = labelView;
+        this.scanner = scanner;
+    }
 
     private void showMenu() {
         System.out.println();

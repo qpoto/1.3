@@ -2,12 +2,15 @@ package ru.qpoto.controller;
 
 import ru.qpoto.model.Writer;
 import ru.qpoto.repository.WriterRepository;
-import ru.qpoto.repository.impl.GsonWriterRepositoryImpl;
 
 import java.util.List;
 
 public class WriterController {
-    private final WriterRepository writerRepository = new GsonWriterRepositoryImpl();
+    private final WriterRepository writerRepository;
+
+    public WriterController(WriterRepository writerRepository) {
+        this.writerRepository = writerRepository;
+    }
 
     public List<Writer> findAll() {
         return writerRepository.findAll();

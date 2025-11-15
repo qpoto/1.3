@@ -8,17 +8,21 @@ import ru.qpoto.model.Writer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-import java.util.SortedMap;
 
 public class WriterView {
-    private final WriterController writerController = new WriterController();
-    private final PostController postController = new PostController();
-    private final PostView postView = new PostView();
+    private final WriterController writerController;
+    private final PostController postController;
+    private final PostView postView;
     private final List<String> commands = List.of("Создать", "Найти", "Показать всех", "Обновить", "Удалить", "Возврат к предыдущему меню");
-    private final Scanner scanner = new Scanner(System.in);
-    private final LabelView labelView = new LabelView();
+    private final Scanner scanner;
     private final String YES = "y";
 
+    public WriterView(WriterController writerController, PostController postController, PostView postView, Scanner scanner) {
+        this.writerController = writerController;
+        this.postController = postController;
+        this.postView = postView;
+        this.scanner = scanner;
+    }
 
     private void showMenu() {
         System.out.println();
@@ -48,7 +52,7 @@ public class WriterView {
         switch (command) {
             case "Создать" -> createWriter();
             case "Найти" -> getById();
-            case "Показать всех" ->  showAllWriters();
+            case "Показать всех" -> showAllWriters();
             case "Обновить" -> update();
             case "Удалить" -> deleteWriter();
             case "Возврат к предыдущему меню" -> {
@@ -84,14 +88,14 @@ public class WriterView {
         Writer newWriter = new Writer();
         System.out.println("Укажите firstName");
         String firstName = scanner.next();
-        System.out.println("Укажите firstName");
+        System.out.println("Укажите lastName");
         String lastName = scanner.next();
-        System.out.println("Добавить posts? нажмите Y или N");
+        System.out.println("Добавить posts? Нажмите Y или N");
         String needPosts = scanner.next();
         List<Post> posts = new ArrayList<>();
         if (needPosts.equalsIgnoreCase(YES)) {
             if (postController.findAll().isEmpty()) {
-                System.out.println("Нет созданных Post, создать? нажмите Y или N");
+                System.out.println("Нет созданных Post, создать? Нажмите Y или N");
                 needPosts = scanner.next();
                 if (needPosts.equalsIgnoreCase(YES)) {
                     postView.createPost();
@@ -127,7 +131,7 @@ public class WriterView {
         System.out.println("Укажите id");
         Long id = scanner.nextLong();
         Writer newWriter = writerController.findById(id);
-        System.out.println("Обновить firstName? нажмите Y или N");
+        System.out.println("Обновить firstName? Нажмите Y или N");
         String firstName = scanner.next();
         if (firstName.equalsIgnoreCase(YES)) {
             System.out.println("Введите firstName");
@@ -137,7 +141,7 @@ public class WriterView {
         String lastName = scanner.next();
         if (lastName.equalsIgnoreCase(YES)) {
             System.out.println("Введите lastName");
-            newWriter.setFirstName(scanner.next());
+            newWriter.setLastName(scanner.next());
         }
         writerController.update(newWriter);
     }

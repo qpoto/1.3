@@ -10,10 +10,17 @@ import java.util.Scanner;
 public class StartUI {
     private final List<String> commands = List.of("Writers", "Posts", "Labels", "Exit");
 
-    private final Scanner scanner = new Scanner(System.in);
-    private final WriterView writerView = new WriterView();
-    private final LabelView labelView = new LabelView();
-    private final PostView postView = new PostView();
+    private final Scanner scanner;
+    private final WriterView writerView;
+    private final LabelView labelView;
+    private final PostView postView;
+
+    public StartUI(Scanner scanner, WriterView writerView, LabelView labelView, PostView postView) {
+        this.scanner = scanner;
+        this.writerView = writerView;
+        this.labelView = labelView;
+        this.postView = postView;
+    }
 
     private void showMenu() {
         System.out.println();

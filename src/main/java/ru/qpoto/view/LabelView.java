@@ -7,9 +7,14 @@ import java.util.List;
 import java.util.Scanner;
 
 public class LabelView {
-    public final LabelController labelController = new LabelController();
+    public final LabelController labelController;
     private final List<String> commands = List.of("Создать", "Найти", "Показать всех", "Обновить", "Удалить", "Возврат к предыдущему меню");
-    private final Scanner scanner = new Scanner(System.in);
+    private final Scanner scanner;
+
+    public LabelView(LabelController labelController, Scanner scanner) {
+        this.labelController = labelController;
+        this.scanner = scanner;
+    }
 
     private void showMenu() {
         System.out.println();

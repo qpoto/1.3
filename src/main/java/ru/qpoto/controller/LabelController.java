@@ -1,21 +1,22 @@
 package ru.qpoto.controller;
 
 import ru.qpoto.model.Label;
-import ru.qpoto.model.Post;
-import ru.qpoto.model.Writer;
 import ru.qpoto.repository.LabelRepository;
 import ru.qpoto.repository.PostRepository;
 import ru.qpoto.repository.WriterRepository;
-import ru.qpoto.repository.impl.GsonLabelRepositoryImpl;
-import ru.qpoto.repository.impl.GsonPostRepositoryImpl;
-import ru.qpoto.repository.impl.GsonWriterRepositoryImpl;
 
 import java.util.List;
 
 public class LabelController {
-    private final LabelRepository labelRepository = new GsonLabelRepositoryImpl();
-    private final PostRepository postRepository = new GsonPostRepositoryImpl();
-    private final WriterRepository writerRepository = new GsonWriterRepositoryImpl();
+    private final LabelRepository labelRepository;
+    private final PostRepository postRepository;
+    private final WriterRepository writerRepository;
+
+    public LabelController(LabelRepository labelRepository, PostRepository postRepository, WriterRepository writerRepository) {
+        this.labelRepository = labelRepository;
+        this.postRepository = postRepository;
+        this.writerRepository = writerRepository;
+    }
 
     public List<Label> findAll() {
         return labelRepository.findAll();

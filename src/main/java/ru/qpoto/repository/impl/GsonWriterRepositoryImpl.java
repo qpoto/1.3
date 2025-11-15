@@ -3,14 +3,11 @@ package ru.qpoto.repository.impl;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import ru.qpoto.model.Post;
 import ru.qpoto.model.Status;
 import ru.qpoto.model.Writer;
 import ru.qpoto.repository.WriterRepository;
 
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -29,7 +26,7 @@ public class GsonWriterRepositoryImpl implements WriterRepository {
     @Override
     public List<Writer> findAll() {
         Gson gson = new Gson();
-        try (FileReader reader = new FileReader(path)) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
             Type listType = new TypeToken<List<Writer>>() {
             }.getType();
             List<Writer> writers = gson.fromJson(reader, listType);
@@ -48,7 +45,7 @@ public class GsonWriterRepositoryImpl implements WriterRepository {
         writers.add(writer);
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        try (FileWriter jsonFileWriter = new FileWriter(path)) {
+        try (BufferedWriter jsonFileWriter = new BufferedWriter(new FileWriter(path))) {
             gson.toJson(writers, jsonFileWriter);
         } catch (IOException e) {
             e.printStackTrace();
@@ -62,7 +59,7 @@ public class GsonWriterRepositoryImpl implements WriterRepository {
         if (writer != null && !writer.equals(entity)) {
             writers.set(writers.indexOf(writer), entity);
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            try (FileWriter jsonFileWriter = new FileWriter(path)) {
+            try (BufferedWriter jsonFileWriter = new BufferedWriter(new FileWriter(path))) {
                 gson.toJson(writers, jsonFileWriter);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -78,7 +75,7 @@ public class GsonWriterRepositoryImpl implements WriterRepository {
         if (writer != null) {
             writer.setStatus(Status.DELETED);
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            try (FileWriter jsonFileWriter = new FileWriter(path)) {
+            try (BufferedWriter jsonFileWriter = new BufferedWriter(new FileWriter(path))) {
                 gson.toJson(writers, jsonFileWriter);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -90,13 +87,13 @@ public class GsonWriterRepositoryImpl implements WriterRepository {
     public void deletePost(Long id) {
         List<Writer> writers = findAll();
         writers.forEach(writer ->
-                        writer.getPosts().stream()
-                                .filter(post -> post.getId().equals(id))
-                                .findFirst()
-                                .ifPresent(post -> post.setStatus(Status.DELETED))
-                );
+                writer.getPosts().stream()
+                        .filter(post -> post.getId().equals(id))
+                        .findFirst()
+                        .ifPresent(post -> post.setStatus(Status.DELETED))
+        );
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        try (FileWriter jsonFileWriter = new FileWriter(path)) {
+        try (BufferedWriter jsonFileWriter = new BufferedWriter(new FileWriter(path))) {
             gson.toJson(writers, jsonFileWriter);
         } catch (IOException e) {
             e.printStackTrace();
@@ -109,15 +106,15 @@ public class GsonWriterRepositoryImpl implements WriterRepository {
         writers.forEach(writer ->
                 writer.getPosts()
                         .forEach(post ->
-                        post.getLabels()
-                                .stream()
-                                .filter(label -> label.getId().equals(id))
-                                .findFirst()
-                                .ifPresent(label -> label.setStatus(Status.DELETED))
-                )
+                                post.getLabels()
+                                        .stream()
+                                        .filter(label -> label.getId().equals(id))
+                                        .findFirst()
+                                        .ifPresent(label -> label.setStatus(Status.DELETED))
+                        )
         );
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        try (FileWriter jsonFileWriter = new FileWriter(path)) {
+        try (BufferedWriter jsonFileWriter = new BufferedWriter(new FileWriter(path))) {
             gson.toJson(writers, jsonFileWriter);
         } catch (IOException e) {
             e.printStackTrace();
