@@ -10,75 +10,79 @@ import ru.qpoto.repository.LabelRepository;
 import java.io.*;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 public class GsonLabelRepositoryImpl implements LabelRepository {
-    private final String path = "label.json";
+
+    private final String path = "src/main/resources/labels.json";
+    private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     @Override
     public Label findById(Long id) {
-        List<Label> labels = findAll();
-        return labels.stream().filter(p -> p.getId().equals(id)).findFirst().orElse(null);
+        return findAll().stream()
+                .filter(label -> label.getId().equals(id))
+                .findFirst()
+                .orElse(null);
     }
 
     @Override
     public List<Label> findAll() {
-        Gson gson = new Gson();
-        try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
-            Type listType = new TypeToken<List<Label>>() {
-            }.getType();
-            List<Label> labels = gson.fromJson(reader, listType);
-            return labels != null ? labels : new ArrayList<>();
-        } catch (IOException e) {
-            return new ArrayList<>();
-        }
+        return readLabelsFromFile();
     }
 
     @Override
     public void save(Label entity) {
         List<Label> labels = findAll();
-        Optional<Label> lasLabel = labels.stream().max(Comparator.comparing(Label::getId));
-        Long id = lasLabel.isPresent() ? lasLabel.get().getId() : Long.valueOf(0L);
-        entity.setId(++id);
+        entity.setId(generatedId(labels));
         labels.add(entity);
-
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        try (BufferedWriter jsonFileWriter = new BufferedWriter(new FileWriter(path))) {
-            gson.toJson(labels, jsonFileWriter);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        writeLabelsToFile(labels);
     }
 
     @Override
     public void update(Label entity) {
         List<Label> labels = findAll();
-        Label label = labels.stream().filter(w -> w.getId().equals(entity.getId())).findFirst().orElse(null);
-        if (label != null && !label.equals(entity)) {
-            labels.set(labels.indexOf(label), entity);
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            try (BufferedWriter jsonFileWriter = new BufferedWriter(new FileWriter(path))) {
-                gson.toJson(labels, jsonFileWriter);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        Label existing = labels.stream()
+                .filter(label -> label.getId().equals(entity.getId()))
+                .findFirst()
+                .orElse(null);
+        if (existing != null && !existing.equals(entity)) {
+            labels.set(labels.indexOf(existing), entity);
+            writeLabelsToFile(labels);
         }
     }
 
     @Override
     public void delete(Long id) {
         List<Label> labels = findAll();
-        Label label = labels.stream().filter(w -> w.getId().equals(id)).findFirst().orElse(null);
-        if (label != null) {
-            label.setStatus(Status.DELETED);
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            try (FileWriter jsonFileWriter = new FileWriter(path)) {
-                gson.toJson(labels, jsonFileWriter);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        labels.stream()
+                .filter(label -> label.getId().equals(id))
+                .findFirst()
+                .ifPresent(label -> label.setStatus(Status.DELETED));
+        writeLabelsToFile(labels);
+    }
+
+    private Long generatedId(List<Label> labels) {
+        return labels.stream()
+                .mapToLong(Label::getId)
+                .max()
+                .orElse(0L) + 1;
+    }
+
+    private void writeLabelsToFile(List<Label> labels) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(path))) {
+            gson.toJson(labels, writer);
+        } catch (IOException e) {
+            System.out.println("Не удалось обновить labels");;
+        }
+    }
+
+    private List<Label> readLabelsFromFile() {
+        try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
+            Type listType = new TypeToken<List<Label>>() {}.getType();
+            List<Label> labels = gson.fromJson(reader, listType);
+            return labels != null ? labels : new ArrayList<>();
+        } catch (IOException e) {
+            return new ArrayList<>();
         }
     }
 }

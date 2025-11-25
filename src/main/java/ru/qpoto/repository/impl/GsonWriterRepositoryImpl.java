@@ -10,114 +10,106 @@ import ru.qpoto.repository.WriterRepository;
 import java.io.*;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 public class GsonWriterRepositoryImpl implements WriterRepository {
-    private final String path = "writers.json";
+
+    private final String path = "src/main/resources/writers.json";
+    private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     @Override
     public Writer findById(Long id) {
-        List<Writer> writers = findAll();
-        return writers.stream().filter(w -> w.getId().equals(id)).findFirst().orElse(null);
+        return findAll().stream()
+                .filter(writer -> writer.getId().equals(id))
+                .findFirst()
+                .orElse(null);
     }
 
     @Override
     public List<Writer> findAll() {
-        Gson gson = new Gson();
-        try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
-            Type listType = new TypeToken<List<Writer>>() {
-            }.getType();
-            List<Writer> writers = gson.fromJson(reader, listType);
-            return writers != null ? writers : new ArrayList<>();
-        } catch (IOException e) {
-            return new ArrayList<>();
-        }
+        return readWritersFromFile();
     }
 
     @Override
     public void save(Writer writer) {
-        List<Writer> writers = findAll();
-        Optional<Writer> lastWriter = writers.stream().max(Comparator.comparing(Writer::getId));
-        Long id = lastWriter.isPresent() ? lastWriter.get().getId() : Long.valueOf(0L);
-        writer.setId(++id);
+        List<Writer> writers = readWritersFromFile();
+        writer.setId(generatedId(writers));
         writers.add(writer);
-
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        try (BufferedWriter jsonFileWriter = new BufferedWriter(new FileWriter(path))) {
-            gson.toJson(writers, jsonFileWriter);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        writeWritersToFile(writers);
     }
 
     @Override
     public void update(Writer entity) {
-        List<Writer> writers = findAll();
-        Writer writer = writers.stream().filter(w -> w.getId().equals(entity.getId())).findFirst().orElse(null);
-        if (writer != null && !writer.equals(entity)) {
-            writers.set(writers.indexOf(writer), entity);
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            try (BufferedWriter jsonFileWriter = new BufferedWriter(new FileWriter(path))) {
-                gson.toJson(writers, jsonFileWriter);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        List<Writer> writers = readWritersFromFile();
+        Writer existing = writers.stream()
+                .filter(w -> w.getId().equals(entity.getId()))
+                .findFirst()
+                .orElse(null);
+        if (existing != null && !existing.equals(entity)) {
+            int index = writers.indexOf(existing);
+            writers.set(index, entity);
+            writeWritersToFile(writers);
         }
-
     }
 
     @Override
     public void delete(Long id) {
-        List<Writer> writers = findAll();
-        Writer writer = writers.stream().filter(w -> w.getId().equals(id)).findFirst().orElse(null);
-        if (writer != null) {
-            writer.setStatus(Status.DELETED);
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            try (BufferedWriter jsonFileWriter = new BufferedWriter(new FileWriter(path))) {
-                gson.toJson(writers, jsonFileWriter);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        List<Writer> writers = readWritersFromFile();
+        writers.stream()
+                .filter(writer -> writer.getId().equals(id))
+                .findFirst()
+                .ifPresent(writer -> writer.setStatus(Status.DELETED));
+        writeWritersToFile(writers);
     }
 
     @Override
     public void deletePost(Long id) {
-        List<Writer> writers = findAll();
+        List<Writer> writers = readWritersFromFile();
         writers.forEach(writer ->
                 writer.getPosts().stream()
                         .filter(post -> post.getId().equals(id))
                         .findFirst()
                         .ifPresent(post -> post.setStatus(Status.DELETED))
         );
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        try (BufferedWriter jsonFileWriter = new BufferedWriter(new FileWriter(path))) {
-            gson.toJson(writers, jsonFileWriter);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        writeWritersToFile(writers);
     }
 
     @Override
     public void deleteLabel(Long id) {
-        List<Writer> writers = findAll();
+        List<Writer> writers = readWritersFromFile();
         writers.forEach(writer ->
-                writer.getPosts()
-                        .forEach(post ->
-                                post.getLabels()
-                                        .stream()
-                                        .filter(label -> label.getId().equals(id))
-                                        .findFirst()
-                                        .ifPresent(label -> label.setStatus(Status.DELETED))
-                        )
+                writer.getPosts().forEach(post ->
+                        post.getLabels().stream()
+                                .filter(label -> label.getId().equals(id))
+                                .findFirst()
+                                .ifPresent(label -> label.setStatus(Status.DELETED))
+                )
         );
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        try (BufferedWriter jsonFileWriter = new BufferedWriter(new FileWriter(path))) {
-            gson.toJson(writers, jsonFileWriter);
+        writeWritersToFile(writers);
+    }
+
+    private Long generatedId(List<Writer> writers) {
+        return writers.stream()
+                .mapToLong(Writer::getId)
+                .max()
+                .orElse(0L) + 1;
+    }
+
+    private void writeWritersToFile(List<Writer> writers) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(path))) {
+            gson.toJson(writers, writer);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Не удалось обновить writers");;
+        }
+    }
+
+    private List<Writer> readWritersFromFile() {
+        try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
+            Type listType = new TypeToken<List<Writer>>() {}.getType();
+            List<Writer> writers = gson.fromJson(reader, listType);
+            return writers != null ? writers : new ArrayList<>();
+        } catch (IOException e) {
+            return new ArrayList<>();
         }
     }
 }
